@@ -4,6 +4,8 @@ import numpy as np # type: ignore
 import warnings
 import os
 import requests # type: ignore
+import matplotlib.pyplot as plt # type: ignore
+import sys
 
 # 屏蔽因为智学网导出造成的警告
 warnings.filterwarnings('ignore')
@@ -54,7 +56,6 @@ def rean_xlsx(file_path):
     return data
     
 def draw_pic(datas,student,subject='总分'):
-    import matplotlib.pyplot as plt # type: ignore
     for i in range(len(datas)):
         if not (subject in datas[i]['subject'] and student in datas[i]['student']):
             print("数据错误,缺少学生或科目信息")
@@ -86,7 +87,7 @@ def send_request(url):
     try:
         response = requests.get(url)
         response.raise_for_status()  # 如果响应状态码不是200，会抛出异常
-        return response.json()
+        return response.json()  # 如果响应是JSON格式，可以解析为字典
     except requests.exceptions.RequestException as e:
         print(f"请求失败: {e}")
         return None
@@ -100,7 +101,7 @@ if __name__ == '__main__':
     js = send_request("https://db.yearnstudio.cn/static/cj/version.json")
     try:
         if js.get('version') != version:
-            print("发现新版本，请前往alist.yearnstudio.cn下载最新版本")
+            print("发现新版本，请前往 https://alist.yearnstudio.cn/作品/成绩分析器 下载最新版本")
         else:
             print("当前版本为最新版本\n")
     except:
@@ -108,7 +109,7 @@ if __name__ == '__main__':
     if os.path.exists('./data') == False:
         print("data文件夹不存在，已创建")
         os.mkdir('./data')
-    pause = input("在放好文件后，按任意键继续......\n")
+    pause = input("在放好文件后，按回车键继续......\n")
     #列出data目录的所有xlsx文件
     files = os.listdir('./data')
     ar = []
@@ -119,7 +120,7 @@ if __name__ == '__main__':
     print("扫描完成，共" + str(len(ar)) + "个xlsx文件\n")
     if len(ar) == 0 or len(ar) == 1:
         print("请至少输入两个xlsx文件")
-        exit()
+        sys.exit()
     print("考试数据顺序：")
     for i in range(len(ar)):
         print(str(i + 1) + ":" + ar[i]['exam'])
@@ -135,7 +136,7 @@ if __name__ == '__main__':
     while True:
         student = input("请输入需要分析学生,输入q退出程序：")
         if student == 'q':
-            exit()
+            sys.exit()
         while True:
             subject = input("请输入需要分析科目,输入q重新选择学生：")
             if subject == 'q':
